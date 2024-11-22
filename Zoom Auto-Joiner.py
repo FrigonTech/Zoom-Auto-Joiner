@@ -8,12 +8,9 @@ from datetime import datetime
 meetings = [{"time": "00:00", "url": "link"}]
 
 def join_meeting(meeting_url):
+    
     print(f"Joining meeting: {meeting_url}")
     webbrowser.open(meeting_url)
-    # Run the menu function
-    menu_thread = threading.Thread(target=show_menu)
-    menu_thread.daemon = True
-    menu_thread.start()
 
 def schedule_auto_join_meeting():
     for index, meeting in enumerate(meetings):
@@ -21,7 +18,7 @@ def schedule_auto_join_meeting():
             continue
         schedule_time = meeting["time"]
         print(f"Scheduling meeting at {schedule_time} with URL: {meeting['url']}")
-        schedule.every().day.at(schedule_time).do(join_meeting, meeting["url"])
+        schedule.every().day.at(schedule_time).do(lambda m=meeting["url"]: join_meeting(m))
         print(f"Scheduled meeting at {schedule_time} for today")
 
 # Run scheduled tasks
@@ -44,7 +41,11 @@ def show_menu():
 
         if str1 == "a":
             str2 = input("Enter Hours and Minutes in hh:mm format (e.g., 14:30) in 24-hour form: \n")
+            if str2=="restart":
+                continue
             str3 = input("Enter meeting link: \n")
+            if str3=="restart":
+                continue
             meetings.append({"time": f"{str2}", "url": f"{str3}"})
             print("Meetings: ", meetings)
             schedule_auto_join_meeting()
